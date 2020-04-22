@@ -1,4 +1,3 @@
-__author__ = 'tylin'
 from .tokenizer.ptbtokenizer import PTBTokenizer
 from .bleu.bleu import Bleu
 from .meteor.meteor import Meteor
@@ -8,13 +7,13 @@ from .spice.spice import Spice
 
 
 class COCOEvalCap:
-    def __init__(self, coco, cocoRes):
+    def __init__(self, gt_key_to_captions, pred_key_to_captions):
         self.evalImgs = []
         self.eval = {}
         self.imgToEval = {}
-        self.coco = coco
-        self.cocoRes = cocoRes
-        self.params = {'image_id': coco.getImgIds()}
+        self.gt_key_to_captions = gt_key_to_captions
+        self.pred_key_to_captions = pred_key_to_captions
+        self.params = {'image_id': self.pred_key_to_captions.keys()}
 
     def evaluate(self):
         imgIds = self.params['image_id']
@@ -22,8 +21,8 @@ class COCOEvalCap:
         gts = {}
         res = {}
         for imgId in imgIds:
-            gts[imgId] = self.coco.imgToAnns[imgId]
-            res[imgId] = self.cocoRes.imgToAnns[imgId]
+            gts[imgId] = self.gt_key_to_captions[imgId]
+            res[imgId] = self.pred_key_to_captions[imgId]
 
         # =================================================
         # Set up scorers
@@ -42,7 +41,7 @@ class COCOEvalCap:
             (Meteor(),"METEOR"),
             (Rouge(), "ROUGE_L"),
             (Cider(), "CIDEr"),
-            (Spice(), "SPICE")
+            #(Spice(), "SPICE")
         ]
 
         # =================================================
